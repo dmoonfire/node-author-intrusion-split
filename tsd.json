@@ -1,6 +1,6 @@
 {
   "version": "v4",
-  "repo": "dmoonfire/DefinitelyTyped",
+  "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
@@ -10,6 +10,9 @@
     },
     "jasmine/jasmine.d.ts": {
       "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
+    },
+    "natural/natural.d.ts": {
+      "commit": "f7930fb7270846583e5aea598cc381f4cb95a3c3"
     }
   }
 }
