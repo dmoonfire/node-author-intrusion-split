@@ -8,7 +8,7 @@
         "outDir": "dist",
         "preserveConstEnums": true,
         "removeComments": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "target": "es5"
     },
     "formatCodeOptions": {
@@ -30,6 +30,7 @@
         "!node_modules/**/*.ts"
     ],
     "files": [
+        "src/diacritics.ts",
         "src/index.ts",
         "src/refs.ts",
         "src/specs/environment-spec.ts",

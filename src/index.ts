@@ -2,6 +2,7 @@
 
 import natural = require("natural");
 import types = require("node-author-intrusion");
+import diacritics = require("./diacritics");
 
 export interface NodeAuthorIntrusionSplitOptions {
     /**
@@ -26,7 +27,9 @@ export interface NodeAuthorIntrusionSplitOptions {
      * of the list. The operations are done in order.
      *
      * The operations are: "lowercase" (no arguments), "replace" (search
-     * string, replacement string).
+     * string, replacement string), "diacritics" (no arguments) to remove various
+     * language diacritics and accents because Javascript can't handle Unicode
+     * very well at the moment.
      *
      * If this is unset, then only a lowercase normalization is done.
      */
@@ -103,7 +106,7 @@ function getTokenizer(options: NodeAuthorIntrusionSplitOptions): Tokenizer {
     }
 }
 
-function normalizeToken(options: NodeAuthorIntrusionSplitOptions, text: string): string
+function normalizeText(options: NodeAuthorIntrusionSplitOptions, text: string): string
 {
     // If we don't have options or this one isn't set, the default is to
     // lowercase the text value.
@@ -131,6 +134,13 @@ function normalizeToken(options: NodeAuthorIntrusionSplitOptions, text: string):
                 // the same stem/root.
                 text = text.replace(operation[1], operation[2]);
                 break;
+
+            case "diacritics":
+                // Javascript doesn't really handle diacritics and accents well
+                // with ES5. Because of this, we strip out the fancy characters
+                // for purposes of normalization and splitting.
+                text = diacritics.removeDiacritics(text);
+                break;
         }
     }
 
@@ -147,17 +157,15 @@ function splitTokens(
     // Split out the tokens using the tokenizer.
     var lineText = line.text;
     var lineLocation = line.location;
-    var tokens = tokenizer.tokenize(line.text);
+    var normalizedLineText = normalizeText(options, lineText);
+    var tokens = tokenizer.tokenize(normalizedLineText);
 
     // Create the tokens with the text and location.
     var index = 0;
 
     for (var tokenText of tokens) {
-        // Get the normalized version of the token.
-        var normal = normalizeToken(options, tokenText);
-
         // Pull out the token and figure where it is in the source file.
-        var lineIndex = lineText.indexOf(tokenText, index);
+        var lineIndex = normalizedLineText.indexOf(tokenText, index);
 
         if (lineIndex < 0) {
             throw RangeError("Cannot find text of " + tokenText + " in " + lineText);
@@ -166,19 +174,20 @@ function splitTokens(
         index = lineIndex + tokenText.length;
 
         // Create a token object for this token with its location.
+        var originalText = lineText.substring(lineIndex, lineIndex + tokenText.length);
         var location = new types.Location(
             lineLocation.path,
             lineLocation.beginLine,
             lineIndex,
             lineLocation.endLine,
             (lineIndex + tokenText.length));
-        var token = new types.Token(location, tokenText, normal);
+        var token = new types.Token(location, originalText, tokenText);
         token.index = content.tokens.length;
 
         // If we have a stemmer, then stem it.
         if (stemmer)
         {
-            token.stem = stemmer.stem(normal);
+            token.stem = stemmer.stem(tokenText);
         }
 
         // Add the token to both the line and the content file. The content list is

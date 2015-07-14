@@ -16,9 +16,13 @@ function setupLines(analysis?: any): types.Content {
     content.lines.push(
         new types.Line(new types.Location("a", 3), "Seven *Eight* Nine"));
 
+    // Run the analysis on the content.
+    return runAnalysis(content, analysis);
+}
+
+function runAnalysis(content: types.Content, analysis?: any): types.Content {
     // Populate the analysis options.
-    if (!analysis)
-    {
+    if (!analysis) {
         analysis = {};
     }
 
@@ -108,4 +112,42 @@ describe("stemmed tokens", function() {
         expect(content.tokens[3].normalized).toEqual(".");
         expect(content.tokens[3].stem).toEqual(".");
     })
+});
+
+describe("diacritic tokens", function() {
+    it("splits line 0 into tokens", function() {
+        var content = new types.Content();
+        content.lines.push(
+            new types.Line(
+                new types.Location("a", 1),
+                "aáàā eèéē iìíī oòóō uùúū"));
+        var analysis = {
+            "name": "test",
+            "options": {
+                "stemmer": "porter",
+                "normalization": [
+                    ["lowercase"],
+                    ["diacritics"]
+                ]
+            }
+        };
+        var content = runAnalysis(content, analysis);
+
+        expect(content.lines[0].tokens.length).toEqual(5);
+
+        expect(content.tokens[0].text).toEqual("aáàā");
+        expect(content.tokens[0].normalized).toEqual("aaaa");
+
+        expect(content.tokens[1].text).toEqual("eèéē");
+        expect(content.tokens[1].normalized).toEqual("eeee");
+
+        expect(content.tokens[2].text).toEqual("iìíī");
+        expect(content.tokens[2].normalized).toEqual("iiii");
+
+        expect(content.tokens[3].text).toEqual("oòóō");
+        expect(content.tokens[3].normalized).toEqual("oooo");
+
+        expect(content.tokens[4].text).toEqual("uùúū");
+        expect(content.tokens[4].normalized).toEqual("uuuu");
+    });
 });
