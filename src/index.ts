@@ -54,6 +54,14 @@ export function process(args: types.AnalysisArguments) {
         var line = args.content.lines[lineIndex];
         splitTokens(args.content, line, options, tokenizer, stemmer);
     }
+
+    // Once we are finished, add in the processing flags.
+    args.content.processed.push("split");
+
+    if (stemmer)
+    {
+        args.content.processed.push("stem");
+    }
 }
 
 function getStemmer(options: NodeAuthorIntrusionSplitOptions): Stemmer {

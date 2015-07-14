@@ -39,6 +39,8 @@ describe("default tokens", function() {
 
         expect(content.tokens.length).toEqual(14);
         expect(content.lines.length).toEqual(3);
+        expect(content.processed).toContain("split");
+        expect(content.processed.length).toBe(1);
     });
     it("splits line 0 into tokens", function() {
         var content = setupLines();
@@ -66,12 +68,18 @@ describe("default tokens", function() {
 describe("stemmed tokens", function() {
     it("splits lines into tokens", function() {
         var analysis = {
-            stemmer: "porter"
+            "name": "test",
+            "options": {
+                "stemmer": "porter"
+            }
         };
         var content = setupLines(analysis);
 
         expect(content.tokens.length).toEqual(14);
         expect(content.lines.length).toEqual(3);
+        expect(content.processed).toContain("split");
+        expect(content.processed).toContain("stem");
+        expect(content.processed.length).toBe(2);
     });
     it("splits line 0 into tokens", function() {
         var analysis = {
