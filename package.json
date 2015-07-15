@@ -1,6 +1,6 @@
 {
   "name": "node-author-intrusion-split",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A processing plugin for Author Intrusion that splits and parses content in various manners.",
   "homepage": "https://github.com/author-intrusion/node-author-intrusion-split",
   "author": "Dylan R. E. Moonfire",
