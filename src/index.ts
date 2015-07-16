@@ -7,8 +7,8 @@ import diacritics = require("./diacritics");
 export interface NodeAuthorIntrusionSplitOptions {
     /**
      * Indicates the type of tokenizer to use while splitting the lines. The
-     * acceptable values are "treebank" (default), "word", and "aggressive"
-     * which correspond to the natural.js tokenizers.
+     * acceptable values are "wordpunct" (default), "treebank", "word", and 
+     * "aggressive" which correspond to the natural.js tokenizers.
      */
     tokenizer?: string;
 
@@ -89,11 +89,13 @@ function getStemmer(options: NodeAuthorIntrusionSplitOptions): Stemmer {
 function getTokenizer(options: NodeAuthorIntrusionSplitOptions): Tokenizer {
     // If we don't have options or a tokenizer, then use the default.
     if (!options || !options.tokenizer) {
-        return new natural.TreebankWordTokenizer();
+        return new natural.WordPunctTokenizer();
     }
 
     // Otherwise, determine it based on the value.
     switch (options.tokenizer.toLowerCase()) {
+        case "wordpunct":
+            return new natural.WordPunctTokenizer();
         case "treebank":
             return new natural.TreebankWordTokenizer();
         case "word":
